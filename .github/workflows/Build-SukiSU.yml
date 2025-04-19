@@ -17,7 +17,7 @@ on:
       ANDROID_VERSION:
         description: "内核安卓版本"
         required: true
-        default: 'android14'
+        default: 'android13'
       KERNEL_VERSION:
         description: "内核版本"
         required: true
@@ -315,3 +315,46 @@ jobs:
         with:
          name: Image_KernelSU_${{ env.KSUVER }}_${{ github.event.inputs.FEIL }}
          path: kernel_workspace/kernel
+
+release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      actions: read
+      
+    steps:
+      - name: Download Image
+        uses: actions/download-artifact@v4
+        with:
+          name: Kernel_ZIP_Artifacts
+          path: ./release_zips
+         
+      - name: Create_release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "build-${{ github.run_id }}"
+          name: "OnePlus11_SukiSU Build ${{ github.run_number }}"
+          body: |
+            - 编译时间: ${{ github.event.repository.updated_at }}
+            - 内核版本: ${{ needs.build.outputs.ksuver }}
+            - 推荐管理器：[SukiSU-Ultra](https://github.com/ShirkNeko/SukiSU-Ultra/releases)
+            - 如果构建的内核版本没变，不必更新！
+          draft: false
+          prerelease: false
+          files: |
+            release_zips/AnyKernel3_KernelSU_*.zip
+            release_zips/Image_KernelSU_*.zip
+
+      - name: Delete older
+        uses: dev-drprasad/delete-older-releases@v0.3.4
+        continue-on-error: true
+        timeout-minutes: 5
+        with:
+          keep_latest: ${{ env.RETENTION_COUNT }}
+          delete_tags: true
+          delete_tag_pattern: 'build-*'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
