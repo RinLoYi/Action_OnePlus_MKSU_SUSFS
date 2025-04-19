@@ -17,7 +17,7 @@ on:
       ANDROID_VERSION:
         description: "内核安卓版本"
         required: true
-        default: 'android15'
+        default: 'android14'
       KERNEL_VERSION:
         description: "内核版本"
         required: true
