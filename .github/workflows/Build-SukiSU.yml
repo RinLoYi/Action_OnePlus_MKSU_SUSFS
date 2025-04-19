@@ -46,7 +46,7 @@ on:
         description: "添加 SUSFS"
         required: true
         type: boolean
-        default: false
+        default: true
       VFS_patch_ENABLED:
         description: "添加 vfs 补丁（新钩子）？"
         required: true
