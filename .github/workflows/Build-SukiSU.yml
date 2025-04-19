@@ -304,24 +304,21 @@ jobs:
           cp Image $GITHUB_WORKSPACE/AnyKernel3/Image
           cp Image $GITHUB_WORKSPACE/kernel_workspace/kernel
          
-      - name: Upload AnyKernel3
-        uses: actions/upload-artifact@v4
-        with:
-         name: AnyKernel3_KernelSU_${{ env.KSUVER }}_${{ github.event.inputs.FEIL }}
-         path: ./AnyKernel3/*
+      - name: Package artifact
+        run: |
+          cd $GITHUB_WORKSPACE/AnyKernel3
+          zip -r ../AnyKernel3_KernelSU_${{ env.KSUVER }}_${{ env.FEIL }}.zip ./*
+          cd ..
+          cd $GITHUB_WORKSPACE/kernel_workspace
+          zip -r ../Image_KernelSU_${{ env.KSUVER }}_${{ env.FEIL }}.zip ./kernel
 
-      - name: Upload Image
-        uses: actions/upload-artifact@v4
-        with:
-         name: Image_KernelSU_${{ env.KSUVER }}_${{ github.event.inputs.FEIL }}
-         path: kernel_workspace/kernel
-
-      - name: Upload Artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: Kernel_ZIP_Artifacts
           path: |
             *.zip
+          retention-days: 1
 
   release:
       needs: build
@@ -332,13 +329,13 @@ jobs:
         actions: read
       
       steps:
-        - name: Download Artifact
+        - name: Download artifact
           uses: actions/download-artifact@v4
           with:
             name: Kernel_ZIP_Artifacts
             path: ./release_zips
          
-        - name: Create_release
+        - name: Create release
           id: create_release
           uses: softprops/action-gh-release@v1
           with:
