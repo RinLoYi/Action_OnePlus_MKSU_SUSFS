@@ -3,23 +3,22 @@ name: Build OnePlus11_Kernel
 on:
   workflow_dispatch:
  
+  env:
+     RETENTION_COUNT: 5
+     CPU: 'sm8550'
+     FEIL: 'oneplus_11_v'
+     CPUD: 'kalama'
+     ANDROID_VERSION: 'android13'
+     KERNEL_VERSION: '5.15'
+     KERNEL_NAME: '5.15.149-android13-8-SukiSU-op11'
+     kernelsu_variant: SukiSU-Ultra
+     kernelsu_version: main
+     SUSFS_ENABLED: true
+     VFS_patch_ENABLED: enable
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
-   env:
-      RETENTION_COUNT: 5
-      CPU: 'sm8550'
-      FEIL: 'oneplus_11_v'
-      CPUD: 'kalama'
-      ANDROID_VERSION: 'android13'
-      KERNEL_VERSION: '5.15'
-      KERNEL_NAME: '5.15.149-android13-8-SukiSU-op11'
-      kernelsu_variant: SukiSU-Ultra
-      kernelsu_version: main
-      SUSFS_ENABLED: true
-      VFS_patch_ENABLED: enable
 
     steps:
       - name: Maximize build space
@@ -52,7 +51,7 @@ jobs:
       - name: Initialize repo and sync
         run: |
          mkdir kernel_workspace && cd kernel_workspace
-         repo init -u https://github.com/OnePlusOSS/kernel_manifest.git -b refs/heads/oneplus/${{ github.event.inputs.CPU }} -m ${{ github.event.inputs.FEIL }}.xml --depth=1
+         repo init -u https://github.com/OnePlusOSS/kernel_manifest.git -b refs/heads/oneplus/${{ env.CPU }} -m ${{ env.FEIL }}.xml --depth=1
          repo sync
          rm kernel_platform/common/android/abi_gki_protected_exports_* || echo "No protected exports!"
          rm kernel_platform/msm-kernel/android/abi_gki_protected_exports_* || echo "No protected exports!"
@@ -61,16 +60,16 @@ jobs:
          sed -i 's/ -dirty//g' kernel_platform/external/dtc/scripts/setlocalversion
       
       - name: SukiSU-Ultra & SukiSU version
-        if: ${{ github.event.inputs.kernelsu_variant == 'SukiSU-Ultra' || github.event.inputs.kernelsu_variant == 'SukiSU' }}
+        if: ${{ env.KERNELSU_VARIANT == 'SukiSU-Ultra' || env.KERNELSU_VARIANT == 'SukiSU' }}
         run: |
-          if [[ "${{ github.event.inputs.kernelsu_version }}" == "tag" ]]; then
+          if [[ "${{ env.KERNELSU_VERSION }}" == "tag" ]]; then
             echo "BRANCH=-" >> $GITHUB_ENV
-          elif [[ "${{ github.event.inputs.kernelsu_version }}" == "main" ]]; then
+          elif [[ "${{ env.KERNELSU_VERSION }}" == "main" ]]; then
             echo "BRANCH=-s susfs-dev" >> $GITHUB_ENV
           fi
           
       - name: Add SukiSU-Ultra
-        if: ${{ github.event.inputs.kernelsu_variant == 'SukiSU-Ultra' }}
+        if: ${{ env.KERNELSU_VARIANT == 'SukiSU-Ultra' }}
         run: |
           cd kernel_workspace/kernel_platform
           curl -LSs "https://raw.githubusercontent.com/ShirkNeko/SukiSU-Ultra/main/kernel/setup.sh" | bash ${{ env.BRANCH }}
@@ -81,7 +80,7 @@ jobs:
           sed -i "s/DKSU_VERSION=12800/DKSU_VERSION=${KSU_VERSION}/" kernel/Makefile
 
       - name: Add SukiSU
-        if: ${{ github.event.inputs.kernelsu_variant == 'SukiSU' }}
+        if: ${{ env.KERNELSU_VARIANT == 'SukiSU' }}
         run: |
           cd kernel_workspace/kernel_platform
           curl -LSs "https://raw.githubusercontent.com/ShirkNeko/KernelSU/main/kernel/setup.sh" | bash ${{ env.BRANCH }}
@@ -92,15 +91,15 @@ jobs:
           sed -i "s/DKSU_VERSION=16/DKSU_VERSION=${KSU_VERSION}/" kernel/Makefile
           
       - name: Apply SUSFS Patches SukiSU
-        if: ${{ github.event.inputs.SUSFS_ENABLED == 'true' }}
+        if: ${{ env.SUSFS_ENABLED == 'true' }}
         run: |
           cd kernel_workspace
-          git clone https://gitlab.com/shirkneko/susfs4ksu.git -b gki-${{ github.event.inputs.ANDROID_VERSION }}-${{ github.event.inputs.KERNEL_VERSION }}
+          git clone https://gitlab.com/shirkneko/susfs4ksu.git -b gki-${{ env.ANDROID_VERSION }}-${{ env.KERNEL_VERSION }}
           git clone https://github.com/ShirkNeko/SukiSU_patch.git
           cd kernel_platform
 
           # Copy SUSFS patches
-          cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ github.event.inputs.ANDROID_VERSION }}-${{ github.event.inputs.KERNEL_VERSION }}.patch ./common/
+          cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ env.ANDROID_VERSION }}-${{ env.KERNEL_VERSION }}.patch ./common/
           cp ../susfs4ksu/kernel_patches/fs/* ./common/fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./common/include/linux/
 
@@ -111,11 +110,11 @@ jobs:
           
           echo "正在给内核打susfs补丁"
           cd ./common
-          patch -p1 < 50_add_susfs_in_gki-${{ github.event.inputs.ANDROID_VERSION }}-${{ github.event.inputs.KERNEL_VERSION }}.patch || true
+          patch -p1 < 50_add_susfs_in_gki-${{ env.ANDROID_VERSION }}-${{ env.KERNEL_VERSION }}.patch || true
           echo "完成"
           
       - name: Apply Hide Stuff Patches
-        if: ${{ github.event.inputs.SUSFS_ENABLED == 'true' }}
+        if: ${{ env.SUSFS_ENABLED == 'true' }}
         run: |
           cd kernel_workspace/kernel_platform/common
           #cp ../../SukiSU_patch/69_hide_stuff.patch ./
@@ -123,7 +122,7 @@ jobs:
           #patch -p1 -F 3 < 69_hide_stuff.patch
          
       - name: Apply New Hooks Patches
-        if: ${{ github.event.inputs.VFS_patch_ENABLED == 'enable' }}
+        if: ${{ env.VFS_patch_ENABLED == 'enable' }}
         run: |
           cd kernel_workspace/kernel_platform/common
           cp ../../SukiSU_patch/hooks/syscall_hooks.patch ./
@@ -131,7 +130,7 @@ jobs:
           patch -p1 -F 3 < syscall_hooks.patch
           echo "完成"
 
-          #  cp ../../SukiSU_patch/other/lz4k_patch/${{ github.event.inputs.KERNEL_VERSION }}/lz4kd.patch ./
+          #  cp ../../SukiSU_patch/other/lz4k_patch/${{ env.KERNEL_VERSION }}/lz4kd.patch ./
           #  patch -p1 -F 3 < lz4kd.patch || true
 
       - name: Add SUSFS Configuration Settings
@@ -140,12 +139,12 @@ jobs:
           # Add KSU configuration settings
           echo "CONFIG_KSU=y" >> ./common/arch/arm64/configs/gki_defconfig
           
-          if [[ "${{ github.event.inputs.kernelsu_variant }}" == "SukiSU-Ultra" ]]; then
+          if [[ "${{ env.kernelsu_variant }}" == "SukiSU-Ultra" ]]; then
             echo "CONFIG_KPM=y" >> ./common/arch/arm64/configs/gki_defconfig
           fi
 
           # Add VFS configuration settings
-          if [[ "${{ github.event.inputs.VFS_patch_ENABLED }}" == 'enable' ]]; then
+          if [[ "${{ env.VFS_patch_ENABLED }}" == 'enable' ]]; then
             echo "CONFIG_KSU_SUSFS_SUS_SU=n" >> ./common/arch/arm64/configs/gki_defconfig
             echo "CONFIG_KSU_MANUAL_HOOK=y" >> ./common/arch/arm64/configs/gki_defconfig
           else
@@ -169,7 +168,7 @@ jobs:
           echo "CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> ./common/arch/arm64/configs/gki_defconfig
 
-          #if [ "${{ github.event.inputs.KERNEL_VERSION }}" = "5.10" ]; then
+          #if [ "${{ env.KERNEL_VERSION }}" = "5.10" ]; then
           #  echo "CONFIG_ZSMALLOC=y" >> ./common/arch/arm64/configs/gki_defconfig
           #  echo "CONFIG_ZRAM=y" >> ./common/arch/arm64/configs/gki_defconfig
           #  echo "CONFIG_MODULE_SIG=n" >> ./common/arch/arm64/configs/gki_defconfig
@@ -177,13 +176,13 @@ jobs:
           #  echo "CONFIG_ZRAM_DEF_COMP_LZ4KD=y" >> ./common/arch/arm64/configs/gki_defconfig
           #fi
 
-          #if [ "${{ github.event.inputs.KERNEL_VERSION }}" != "6.6" ] && [ "${{ github.event.inputs.KERNEL_VERSION }}" != "5.10" ]; then
+          #if [ "${{ env.KERNEL_VERSION }}" != "6.6" ] && [ "${{ env.KERNEL_VERSION }}" != "5.10" ]; then
           #  sed -i 's/CONFIG_MODULE_SIG=y/CONFIG_MODULE_SIG=n/g' ./common/arch/arm64/configs/gki_defconfig
           #  sed -i 's/CONFIG_ZSMALLOC=m/CONFIG_ZSMALLOC=y/g' ./common/arch/arm64/configs/gki_defconfig
           #  sed -i 's/CONFIG_ZRAM=m/CONFIG_ZRAM=y/g' ./common/arch/arm64/configs/gki_defconfig
           #fi
 
-          #if [ "${{ github.event.inputs.KERNEL_VERSION }}" = "6.6" ]; then
+          #if [ "${{ env.KERNEL_VERSION }}" = "6.6" ]; then
           #  echo "CONFIG_ZSMALLOC=y" >> ./common/arch/arm64/configs/gki_defconfig
           #  sed -i 's/CONFIG_ZRAM=m/CONFIG_ZRAM=y/g' ./common/arch/arm64/configs/gki_defconfig
           #fi
@@ -201,27 +200,27 @@ jobs:
       - name: Add make name
         run: |
          cd kernel_workspace/kernel_platform
-           if [[ "${{ github.event.inputs.KERNEL_VERSION }}" == "6.1" || "${{ github.event.inputs.KERNEL_VERSION }}" == "6.6" ]]; then
+           if [[ "${{ env.KERNEL_VERSION }}" == "6.1" || "${{ env.KERNEL_VERSION }}" == "6.6" ]]; then
              sed -i "/stable_scmversion_cmd/s/-maybe-dirty//g" ./build/kernel/kleaf/impl/stamp.bzl
            fi
-           sed -i '$s|echo "\$res"|echo "\${{ github.event.inputs.KERNEL_NAME }}"|' ./common/scripts/setlocalversion
+           sed -i '$s|echo "\$res"|echo "\${{ env.KERNEL_NAME }}"|' ./common/scripts/setlocalversion
   
       - name: Build kernel
         run: |
           cd kernel_workspace
-          if [[ "${{ github.event.inputs.KERNEL_VERSION }}" == "6.1" || "${{ github.event.inputs.KERNEL_VERSION }}" == "6.6" ]]; then
-            ./kernel_platform/build_with_bazel.py -t ${{ github.event.inputs.CPUD }} gki --action_env=KSU_VERSION
+          if [[ "${{ env.KERNEL_VERSION }}" == "6.1" || "${{ env.KERNEL_VERSION }}" == "6.6" ]]; then
+            ./kernel_platform/build_with_bazel.py -t ${{ env.CPUD }} gki --action_env=KSU_VERSION
           else
-            LTO=thin ./kernel_platform/oplus/build/oplus_build_kernel.sh ${{ github.event.inputs.CPUD }} gki
+            LTO=thin ./kernel_platform/oplus/build/oplus_build_kernel.sh ${{ env.CPUD }} gki
           fi
          
       - name: Make AnyKernel3
         run: |
           git clone https://github.com/Kernel-SU/AnyKernel3 --depth=1
           rm -rf ./AnyKernel3/.git
-          dir1="./kernel_workspace/kernel_platform/out/msm-kernel-${{ github.event.inputs.CPUD }}-gki/dist/"
+          dir1="./kernel_workspace/kernel_platform/out/msm-kernel-${{ env.CPUD }}-gki/dist/"
           dir2="./kernel_workspace/kernel_platform/common/out/arch/arm64/boot/"
-          dir3="./kernel_workspace/kernel_platform/out/msm-${{ github.event.inputs.CPUD }}-${{ github.event.inputs.CPUD }}-gki/dist/"
+          dir3="./kernel_workspace/kernel_platform/out/msm-${{ env.CPUD }}-${{ env.CPUD }}-gki/dist/"
           target1="./AnyKernel3/"
           target2="./kernel_workspace/kernel"
 
@@ -248,9 +247,9 @@ jobs:
           fi
 
       - name: Apply patch_linux and replace Image
-        if: ${{ github.event.inputs.kernelsu_variant == 'SukiSU-Ultra' }}
+        if: ${{ env.kernelsu_variant == 'SukiSU-Ultra' }}
         run: |
-          cd kernel_workspace/kernel_platform/out/msm-kernel-${{ github.event.inputs.CPUD }}-gki/dist
+          cd kernel_workspace/kernel_platform/out/msm-kernel-${{ env.CPUD }}-gki/dist
           curl -LO https://github.com/ShirkNeko/SukiSU_KernelPatch_patch/releases/download/0.11-beta/patch_linux
           chmod +x patch_linux
           ./patch_linux
@@ -260,9 +259,9 @@ jobs:
           cp Image $GITHUB_WORKSPACE/kernel_workspace/kernel
 
       - name: Reproduction of documents
-        if: ${{ github.event.inputs.kernelsu_variant == 'SukiSU' }}
+        if: ${{ env.kernelsu_variant == 'SukiSU' }}
         run: |
-          cd kernel_workspace/kernel_platform/out/msm-kernel-${{ github.event.inputs.CPUD }}-gki/dist
+          cd kernel_workspace/kernel_platform/out/msm-kernel-${{ env.CPUD }}-gki/dist
           cp Image $GITHUB_WORKSPACE/AnyKernel3/Image
           cp Image $GITHUB_WORKSPACE/kernel_workspace/kernel
          
