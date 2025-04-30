@@ -14,7 +14,7 @@ env:
   KERNEL_VERSION: '5.15'
   KERNEL_NAME: '-android13-SukiSU-op11'
   KERNELSU_VARIANT: SukiSU-Ultra
-  KERNELSU_VARIANT: main
+  KERNELSU_VERSION: main
   SUSFS_ENABLED: true
   VFS_patch_ENABLED: enable
 
