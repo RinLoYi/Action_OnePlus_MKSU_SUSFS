@@ -12,7 +12,7 @@ env:
   CPUD: 'kalama'
   ANDROID_VERSION: 'android13'
   KERNEL_VERSION: '5.15'
-  KERNEL_NAME: '5.15.149-android13-8-SukiSU-op11'
+  KERNEL_NAME: 'android13-SukiSU-op11-5.15.149'
   kernelsu_variant: SukiSU-Ultra
   kernelsu_version: main
   SUSFS_ENABLED: true
