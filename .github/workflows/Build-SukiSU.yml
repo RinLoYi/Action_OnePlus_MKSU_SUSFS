@@ -22,6 +22,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    outputs:
+      ksuver: ${{ steps.ksu_version.outputs.ksuver }}
+
     steps:
       - name: Maximize build space
         uses: easimon/maximize-build-space@master
@@ -312,8 +315,8 @@ jobs:
             draft: false
             prerelease: false
             files: |
-              release_zips/AnyKernel3_KernelSU_*.zip
-              release_zips/Image_KernelSU_*.zip
+              release_zips/AnyKernel3_KernelSU*.zip
+              release_zips/Image_KernelSU*.zip
 
         - name: Delete older
           uses: dev-drprasad/delete-older-releases@v0.3.4
