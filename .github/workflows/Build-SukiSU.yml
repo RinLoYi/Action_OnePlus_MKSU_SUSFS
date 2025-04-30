@@ -2,19 +2,21 @@ name: Build OnePlus11_Kernel
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '0 16 * * *'
 
 env:
-  RETENTION_COUNT: 5
-  CPU: 'sm8550'
-  FEIL: 'oneplus_11_v'   
+  RETENTION_COUNT: 5
+  CPU: 'sm8550'
+  FEIL: 'oneplus_11_v'
   CPUD: 'kalama'
-  ANDROID_VERSION: 'android13'
-  KERNEL_VERSION: '5.15'
-  KERNEL_NAME: '5.15.149-android13-8-SukiSU-op11'
-  kernelsu_variant: SukiSU-Ultra
-  kernelsu_version: main
-  SUSFS_ENABLED: true
-  VFS_patch_ENABLED: enable
+  ANDROID_VERSION: 'android13'
+  KERNEL_VERSION: '5.15'
+  KERNEL_NAME: '5.15.149-android13-8-SukiSU-op11'
+  kernelsu_variant: SukiSU-Ultra
+  kernelsu_version: main
+  SUSFS_ENABLED: true
+  VFS_patch_ENABLED: enable
 
 jobs:
   build:
