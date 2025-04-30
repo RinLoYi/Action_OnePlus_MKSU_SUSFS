@@ -75,6 +75,7 @@ jobs:
           
       - name: Add SukiSU-Ultra
         if: ${{ env.KERNELSU_VARIANT == 'SukiSU-Ultra' }}
+        id: ksu_version
         run: |
           cd kernel_workspace/kernel_platform
           curl -LSs "https://raw.githubusercontent.com/ShirkNeko/SukiSU-Ultra/main/kernel/setup.sh" | bash ${{ env.BRANCH }}
@@ -87,6 +88,7 @@ jobs:
 
       - name: Add SukiSU
         if: ${{ env.KERNELSU_VARIANT == 'SukiSU' }}
+        id: ksu_version
         run: |
           cd kernel_workspace/kernel_platform
           curl -LSs "https://raw.githubusercontent.com/ShirkNeko/KernelSU/main/kernel/setup.sh" | bash ${{ env.BRANCH }}
