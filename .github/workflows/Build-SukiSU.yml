@@ -13,8 +13,8 @@ env:
   ANDROID_VERSION: 'android13'
   KERNEL_VERSION: '5.15'
   KERNEL_NAME: '-android13-SukiSU-op11'
-  kernelsu_variant: SukiSU-Ultra
-  kernelsu_version: main
+  KERNELSU_VARIANT: SukiSU-Ultra
+  KERNELSU_VARIANT: main
   SUSFS_ENABLED: true
   VFS_patch_ENABLED: enable
 
@@ -275,10 +275,10 @@ jobs:
       - name: Package artifact
         run: |
           cd $GITHUB_WORKSPACE/AnyKernel3
-          zip -r ../AnyKernel3_KernelSU_${{ env.KSUVER }}${{ env.FEIL }}.zip ./*
+          zip -r ../AnyKernel3_KernelSU_${{ env.KSUVER }}_${{ env.FEIL }}.zip ./*
           cd ..
           cd $GITHUB_WORKSPACE/kernel_workspace
-          zip -r ../Image_KernelSU_${{ env.KSUVER }}${{ env.FEIL }}.zip ./kernel
+          zip -r ../Image_KernelSU_${{ env.KSUVER }}_${{ env.FEIL }}.zip ./kernel
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
