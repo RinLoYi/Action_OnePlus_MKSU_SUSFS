@@ -1,60 +1,21 @@
-name: Build OnePlus_Kernel
+name: Build OnePlus11_Kernel
 on:
-  workflow_dispatch:
-    inputs:
-      CPU:
-        description: "分支"
-        required: true
-        default: 'sm8550'
-      FEIL:
-        description: "配置文件"
-        required: true
-        default: 'oneplus_11_v'
-      CPUD:
-        description: "处理器代号"
-        required: true
-        default: 'kalama'
-      ANDROID_VERSION:
-        description: "内核安卓版本"
-        required: true
-        default: 'android13'
-      KERNEL_VERSION:
-        description: "内核版本"
-        required: true
-        default: '5.15'
-      KERNEL_NAME:
-        description: "修改内核名称"
-        required: true
-        default: '-SukiSU-op11-'
-      kernelsu_variant:
-        description: "选择 KSU"
-        required: true
-        type: choice
-        options:
-          - SukiSU
-          - SukiSU-Ultra
-        default: SukiSU-Ultra
-      kernelsu_version:
-        description: "选择 KSU 版本"
-        required: true
-        type: choice
-        options:
-          - tag
-          - main
-        default: main
-      SUSFS_ENABLED:
-        description: "添加 SUSFS"
-        required: true
-        type: boolean
-        default: true
-      VFS_patch_ENABLED:
-        description: "添加 vfs 补丁（新钩子）？"
-        required: true
-        type: choice
-        options:
-          - enable
-          - disable
-        default: enable
+  workflow_dispatch:
+  schedule:
+    - cron: '0 16 * * *'
+
+    env:
+      RETENTION_COUNT: 5
+      CPU: 'sm8550'
+      FEIL: 'oneplus_11_v'
+      CPUD: 'kalama'
+      ANDROID_VERSION: 'android13'
+      KERNEL_VERSION: '5.15'
+      KERNEL_NAME: '5.15.149-android13-8-SukiSU-op11'
+      kernelsu_variant: SukiSU-Ultra
+      kernelsu_version: main
+      SUSFS_ENABLED:true
+      VFS_patch_ENABLED: enable
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -73,8 +34,8 @@ jobs:
 
       - name: Configure Git
         run: |
-         git config --global user.name "ychenxuan"
-         git config --global user.email "3494167979@qq.com"
+         git config --global user.name "RinLoYi"
+         git config --global user.email "1514299108@qq.com"
 
       - name: Install dependencies
         run: |
