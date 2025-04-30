@@ -1,7 +1,7 @@
 name: Build OnePlus11_Kernel
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:
  
   env:
      RETENTION_COUNT: 5
