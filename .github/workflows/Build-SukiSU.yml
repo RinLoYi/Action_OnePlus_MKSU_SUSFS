@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      ksuuver: ${{ steps.ksu_version_suu.outputs.ksuver }}
+      ksuuver: ${{ steps.ksu_version_suu.outputs.ksuuver }}
       ksuver: ${{ steps.ksu_version_su.outputs.ksuver }}
 
     steps:
