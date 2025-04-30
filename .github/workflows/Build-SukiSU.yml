@@ -254,7 +254,7 @@ jobs:
           fi
 
       - name: Apply patch_linux and replace Image
-        if: ${{ env.kernelsu_variant == 'SukiSU-Ultra' }}
+        if: ${{ env.KERNELSU_VARIANT == 'SukiSU-Ultra' }}
         run: |
           cd kernel_workspace/kernel_platform/out/msm-kernel-${{ env.CPUD }}-gki/dist
           curl -LO https://github.com/ShirkNeko/SukiSU_KernelPatch_patch/releases/download/0.11-beta/patch_linux
@@ -266,7 +266,7 @@ jobs:
           cp Image $GITHUB_WORKSPACE/kernel_workspace/kernel
 
       - name: Reproduction of documents
-        if: ${{ env.kernelsu_variant == 'SukiSU' }}
+        if: ${{ env.KERNELSU_VARIANT == 'SukiSU' }}
         run: |
           cd kernel_workspace/kernel_platform/out/msm-kernel-${{ env.CPUD }}-gki/dist
           cp Image $GITHUB_WORKSPACE/AnyKernel3/Image
