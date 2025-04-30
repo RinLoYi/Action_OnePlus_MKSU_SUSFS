@@ -14,7 +14,7 @@ on:
       KERNEL_NAME: '5.15.149-android13-8-SukiSU-op11'
       kernelsu_variant: SukiSU-Ultra
       kernelsu_version: main
-      SUSFS_ENABLED:true
+      SUSFS_ENABLED: true
       VFS_patch_ENABLED: enable
 jobs:
   build:
