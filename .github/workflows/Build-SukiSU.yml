@@ -81,6 +81,7 @@ jobs:
           cd ./KernelSU
           KSU_VERSION=$(expr $(/usr/bin/git rev-list --count main) "+" 10606)
           echo "KSUVER=$KSU_VERSION" >> $GITHUB_ENV
+          echo "ksuver=$KSU_VERSION" >> $GITHUB_OUTPUT
           export KSU_VERSION=$KSU_VERSION
           sed -i "s/DKSU_VERSION=12800/DKSU_VERSION=${KSU_VERSION}/" kernel/Makefile
 
@@ -92,6 +93,7 @@ jobs:
           cd ./KernelSU
           KSU_VERSION=$(expr $(/usr/bin/git rev-list --count main) "+" 10606)
           echo "KSUVER=$KSU_VERSION" >> $GITHUB_ENV
+          echo "ksuver=$KSU_VERSION" >> $GITHUB_OUTPUT
           export KSU_VERSION=$KSU_VERSION
           sed -i "s/DKSU_VERSION=16/DKSU_VERSION=${KSU_VERSION}/" kernel/Makefile
           
@@ -273,10 +275,10 @@ jobs:
       - name: Package artifact
         run: |
           cd $GITHUB_WORKSPACE/AnyKernel3
-          zip -r ../AnyKernel3_KernelSU_${{ env.KSUVER }}_${{ env.FEIL }}.zip ./*
+          zip -r ../AnyKernel3_KernelSU_${{ env.KSUVER }}${{ env.FEIL }}.zip ./*
           cd ..
           cd $GITHUB_WORKSPACE/kernel_workspace
-          zip -r ../Image_KernelSU_${{ env.KSUVER }}_${{ env.FEIL }}.zip ./kernel
+          zip -r ../Image_KernelSU_${{ env.KSUVER }}${{ env.FEIL }}.zip ./kernel
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -315,8 +317,8 @@ jobs:
             draft: false
             prerelease: false
             files: |
-              release_zips/AnyKernel3_KernelSU*.zip
-              release_zips/Image_KernelSU*.zip
+              release_zips/AnyKernel3_KernelSU_*.zip
+              release_zips/Image_KernelSU_*.zip
 
         - name: Delete older
           uses: dev-drprasad/delete-older-releases@v0.3.4
