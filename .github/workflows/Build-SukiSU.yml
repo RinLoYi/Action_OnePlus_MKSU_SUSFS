@@ -149,7 +149,7 @@ jobs:
           # Add KSU configuration settings
           echo "CONFIG_KSU=y" >> ./common/arch/arm64/configs/gki_defconfig
           
-          if [[ "${{ env.kernelsu_variant }}" == "SukiSU-Ultra" ]]; then
+          if [[ "${{ env.KERNELSU_VARIANT }}" == "SukiSU-Ultra" ]]; then
             echo "CONFIG_KPM=y" >> ./common/arch/arm64/configs/gki_defconfig
           fi
 
