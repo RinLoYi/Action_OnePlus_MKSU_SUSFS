@@ -7,11 +7,11 @@ on:
 
 env:
   RETENTION_COUNT: 5
-  CPU: 'sm8550'
-  FEIL: 'oneplus_11_v'
+  CPU: 'sm8750'
+  FEIL: 'oneplus_13_v'
   CPUD: 'kalama'
-  ANDROID_VERSION: 'android13'
-  KERNEL_VERSION: '5.15'
+  ANDROID_VERSION: 'android15'
+  KERNEL_VERSION: '6.6'
   KERNEL_NAME: '-android13-SukiSU-op11'
   KERNELSU_VARIANT: SukiSU-Ultra
   KERNELSU_VERSION: main
