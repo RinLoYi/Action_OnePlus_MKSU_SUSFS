@@ -104,7 +104,7 @@ jobs:
         if: ${{ env.SUSFS_ENABLED == 'true' }}
         run: |
           cd kernel_workspace
-          git clone https://gitlab.com/shirkneko/susfs4ksu.git -b gki-${{ env.ANDROID_VERSION }}-${{ env.KERNEL_VERSION }}
+          git clone https://github.com/ShirkNeko/susfs4ksu.git -b gki-${{ env.ANDROID_VERSION }}-${{ env.KERNEL_VERSION }}
           git clone https://github.com/ShirkNeko/SukiSU_patch.git
           cd kernel_platform
 
